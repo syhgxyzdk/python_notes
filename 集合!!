@@ -1,0 +1,184 @@
+一、目录
+1、集合概述
+2、关于集合的操作符、关系符号
+3、集合的一系列操作(添加、更新、访问、删除)
+4、关于集合的内建函数、内建方法
+5、小结
+二、集合概述
+集合(set)：把不同的元素组成一起形成集合，是python基本的数据类型。
+集合元素(set elements):组成集合的成员
+1 >>> li=['a','b','c','a']
+2 >>> se =set(li)
+3 >>> se
+4 set(['a', 'c', 'b'])
+集合对象是一组无序排列的可哈希的值：集合成员可以做字典的键
+
+>>> li=[['a','b','c'],['a','c']]
+>>> se = set(li)
+
+Traceback (most recent call last):
+  File "<pyshell#29>", line 1, in <module>
+    se = set(li)
+TypeError: list objects are unhashable
+
+集合分类：可变集合、不可变集合
+可变集合(set)：可添加和删除元素，非可哈希的，不能用作字典的键，也不能做其他集合的元素
+不可变集合(frozenset)：与上面恰恰相反
+集合操作符与关系符号：（忘完了!）
+
+三、集合的相关操作
+1、创建集合
+由于集合没有自己的语法格式，只能通过集合的工厂方法set()和frozenset()创建
+
+>>> s = set('beginman')
+>>> s
+set(['a', 'b', 'e', 'g', 'i', 'm', 'n'])
+>>> t = frozenset('pythonman')
+>>> t
+frozenset(['a', 'h', 'm', 'o', 'n', 'p', 't', 'y'])
+>>> type(s),type(t)
+(<type 'set'>, <type 'frozenset'>)
+>>> len(s),len(t)
+(7, 8)
+>>> s==t
+False
+>>> s=t
+>>> s==t
+True
+>>> 
+
+2、访问集合
+由于集合本身是无序的，所以不能为集合创建索引或切片操作，只能循环遍历或使用in、not in来访问或判断集合元素。
+
+>>> 'a'in s
+True
+>>> 'z'in s
+False
+>>> for i in s:
+    print i
+
+    
+a
+h
+m
+o
+n
+p
+t
+y
+>>> 
+
+3、更新集合
+可使用以下内建方法来更新：
+s.add()
+s.update()
+s.remove()
+注意只有可变集合才能更新：
+
+>>> s.add(0)
+
+Traceback (most recent call last):
+  File"<pyshell#46>", line 1, in <module>
+    s.add(0)AttributeError: 'frozenset'object has no attribute'add'
+>>> type(s)
+<type 'frozenset'>
+>>> se = set(s)
+>>> se
+set(['a', 'h', 'm', 'o', 'n', 'p', 't', 'y'])
+>>> type(se)
+<type 'set'>
+>>> se.add(0)
+>>> se
+set(['a', 0, 'h', 'm', 'o', 'n', 'p', 't', 'y'])
+>>> se.update('MM')
+>>> se
+set(['a', 0, 'h', 'm', 'o', 'n', 'p', 'M', 't', 'y'])
+>>> se.update('Django')
+>>> se
+set(['a', 0, 'D', 'g', 'h', 'j', 'm', 'o', 'n', 'p', 'M', 't', 'y'])
+>>> se.remove('D')
+>>> se
+set(['a', 0, 'g', 'h', 'j', 'm', 'o', 'n', 'p', 'M', 't', 'y'])
+>>> 
+
+del：删除集合本身
+ 四、集合类型操作符
+1、in ,not in
+2、集合等价与不等价(==, !=)
+3、子集、超集(见上表)
+>>> set('shop')<set('cheeshop')
+True
+>>> set('bookshop')>=set('shop')
+True
+4、联合(|)
+联合(union)操作与集合的OR操作其实等价的，联合符号有个等价的方法，union()。
+>>> s1=set('begin')
+>>> s2=set('man')
+>>> s3=s1|s2
+>>> s3
+set(['a', 'b', 'e', 'g', 'i', 'm', 'n'])
+>>> s1.union(s2)
+set(['a', 'b', 'e', 'g', 'i', 'm', 'n'])
+但+ 运算则不适合：
+
+>>> s3New = s1+s2
+
+Traceback (most recent call last):
+  File "<pyshell#68>", line 1, in <module>
+    s3New = s1+s2
+TypeError: unsupported operand type(s) for +: 'set' and 'set'
+
+5、交集(&)
+与集合AND等价，交集符号的等价方法是intersection()
+>>> s1&s2
+set(['n'])
+>>> s1.intersection(s2)
+set(['n'])
+6、查补(-)
+等价方法是difference()
+>>> s1-s2
+set(['i', 'b', 'e', 'g'])
+>>> s1.difference(s2)
+set(['i', 'b', 'e', 'g'])
+7、对称差分(^)
+对称差分是集合的XOR(‘异或’)，取得的元素属于s1,s2但不同时属于s1和s2.其等价方法symmetric_difference()
+>>> s1^s2
+set(['a', 'b', 'e', 'g', 'i', 'm'])
+>>> s1.symmetric_difference(s2)
+set(['a', 'b', 'e', 'g', 'i', 'm'])
+注意：集合之间and,or
+>>> s1 and s2
+set(['a', 'm', 'n'])   #取 s2
+>>> s1 or s2
+set(['i', 'b', 'e', 'g', 'n']) #取 s1
+>>> 
+五、集合、列表、元组、字符串之间转换
+
+>>> list(s1)
+['i', 'b', 'e', 'g', 'n']
+>>> str(s1)
+"set(['i', 'b', 'e', 'g', 'n'])"
+>>> tuple(s1)
+('i', 'b', 'e', 'g', 'n')
+
+应用：
+'''最简单的去重方式'''
+lis = [1,2,3,4,1,2,3,4]
+print list(set(lis))    #[1, 2, 3, 4]
+六、关于集合的内建函数、内建方法
+1、len():返回集合元素个数
+2、set()、frozenset()工厂函数
+3、所有集合方法：
+s.issubset(t)      如果s是t的子集, 返回True, 否则为False.
+s.issuperset(t)    如果s是t的超集, 返回True, 否则为False.
+s.union(t)         返回新集合, s和t的并集.
+s.intersection(t)  返回新集合, s和t的交集.
+s.difference(t)    返回新集合, 是s的成员, 但不是t的成员.
+s.copy()           返回新集合, s的浅拷贝.
+
+s.update(t)        用t中的元素修改s, 即s现在包含s或t的成员.
+s.add(obj)         向s中添加一个元素
+s.remove(obj)      从s中删除一个元素(存在的元素)
+s.discard(obj)     从s中删除一个元素(可以是不存在的元素)
+s.pop()            删除集合中的任意一个元素, 并返回这个元素.
+s.clear()          清空集合
