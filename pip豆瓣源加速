@@ -1,0 +1,2 @@
+pip豆瓣镜像
+pip install XXX -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com
