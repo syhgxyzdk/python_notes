@@ -1,0 +1,22 @@
+Python中title()方法的使用简介
+
+投稿：goldensun 字体：[增加 减小] 类型：转载 时间：2015-05-20 我要评论
+这篇文章主要介绍了Python中title()方法的使用简介,是Python入门中的基础知识,需要的朋友可以参考下
+ title()方法返回所有单词的第一个字符大写的字符串的一个副本。
+语法
+以下是title()方法的语法：
+str.title();
+
+参数
+    NA
+返回值
+此方法返回其中所有单词的前几个字符都是大写的字符串的一个副本。
+例子
+下面的例子显示了title()方法的使用。
+#!/usr/bin/python
+
+str = "this is string example....wow!!!";
+print str.title();
+
+当我们运行上面的程序，它会产生以下结果：
+This Is String Example....Wow!!!
