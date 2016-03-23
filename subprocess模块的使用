@@ -1,0 +1,141 @@
+1. subprocess.call
+
+>>> subprocess.call(["ls", "-l"])  
+0  
+>>> subprocess.call("exit 1", shell=True)  
+1 
+2. 调用系统中cmd命令,显示命令执行的结果:
+x=subprocess.check_output(["echo", "Hello World!"],shell=True)  
+print(x)  
+"Hello World!"  
+
+3. 在python中显示文件内容:
+
+y=subprocess.check_output(["type", "app2.cpp"],shell=True)  
+print(y)  
+#include     
+using namespace std;    
+...... 
+
+4. 查看ipconfig -all命令的输出,并将将输出保存到文件tmp.log中:
+
+handle = open(r'd:\tmp.log','wt')  
+subprocess.Popen(['ipconfig','-all'], stdout=handle) 
+
+5. 查看网络设置ipconfig -all,保存到变量中
+
+output = subprocess.Popen(['ipconfig','-all'], stdout=subprocess.PIPE,shell=True)  
+oc=output.communicate()             #取出output中的字符串  
+
+#communicate() returns a tuple (stdoutdata, stderrdata).  
+print(oc[0]) #打印网络信息  
+
+Windows IP Configuration  
+  
+        Host Name . . . . .  
+
+6. 如果想频繁地和子线程通信,那么不能使用communicate();
+
+因为communicate通信一次之后即关闭了管道.这时可以试试下面的方法:
+p= subprocess.Popen(["wc"], stdin=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)  
+p.stdin.write('your command')  
+p.stdin.flush()  
+#......do something   
+
+try:  
+    #......do something  
+    p.stdout.readline()  
+    #......do something  
+except:  
+    print('IOError')  
+
+
+#......do something more  
+
+p.stdin.write('your other command')  
+p.stdin.flush()  
+#......do something more 
+
+2.2 subprocess子进程和管道进行交互
+
+其实在python中，和shell脚本，其他程序交互的方式有很多，比如：
+os.system(cmd)，os.system只是执行一个shell命令，不能输入、且无返回
+os.open(cmd)，可以交互，但是是一次性的，调用多少次就会创建/销毁多少次进程，性能太差
+1. 一个简单的例子，调用ls命令，两者之间是没有交互的：
+
+import subprocess  
+p = subprocess.Popen('ls') 
+2. 在程序中获取输出的例子：
+
+import subprocess  
+p = subprocess.Popen('ls',stdout=subprocess.PIPE)  
+print p.stdout.readlines() 
+3. 有输入，有输出的例子，
+
+父进程发送'say hi'，子进程输出 test say hi，父进程获取输出并打印
+#test1.py  
+import sys  
+line = sys.stdin.readline()  
+print 'test',line  
+
+#run.py  
+from subprocess import *  
+p =Popen('./test1.py',stdin=PIPE,stdout=PIPE)  
+p.stdin.write('say hi/n')  
+print p.stdout.readline()  
+
+#result  
+test say hi  
+
+4. 连续输入和输出的例子
+
+# test.py
+import sys
+while True:
+        line = sys.stdin.readline()
+        if not line:
+            break
+        sys.stdout.write(line)
+        sys.stdout.flush()
+
+# run.py
+import sys
+from subprocess import *
+proc = Popen(['./test.py'], stdin=PIPE,stdout=PIPE,shell=True)  
+for line in sys.stdin:  
+        proc.stdin.write(line)  
+        proc.stdin.flush()  
+        output = proc.stdout.readline()  
+        sys.stdout.write(output) 
+注意，run.py的flush和test.py中的flush，要记得清空缓冲区，否则程序得不到正确的输入和输出
+
+2.3 python 实时获取子进程输出
+
+1. 方法一
+
+import subprocess  
+
+def main():  
+    process1 = subprocess.Popen(["python", "-u", "sub.py"], shell=False, stdout = subprocess.PIPE, stderr=subprocess.STDOUT) 
+    #print process1.communicate()[0]  
+    while True:  
+        line = process1.stdout.readline()  
+        if not line:  
+            break  
+        print line  
+       
+if __name__ == '__main__':  
+    main() 
+
+2. 方法二：
+
+import subprocess
+import time
+
+p = subprocess.Popen('ping 127.0.0.1 -n 10', stdout=subprocess.PIPE)
+while p.poll() == None:
+    print p.stdout.readline()
+    time.sleep(1)
+print p.stdout.read()
+print 'returen code:', p.returncode
+
