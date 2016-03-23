@@ -1,0 +1,16 @@
+from multiprocessing.dummy import Pool as ThreadPool
+
+def run_multiple_args(args_1, args_2):
+    print args_1, args_2
+    return args_1 + args_2
+
+pool = ThreadPool(2)
+arg_list = [(1,2), (4,8)]
+
+result = pool.map(func=lambda args: run_multiple_args(*args), iterable=arg_list) # <-- see here
+pool.close()
+pool.join()
+print result
+# 1 2
+# 4 8
+#[3, 12]
