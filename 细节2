@@ -1,0 +1,144 @@
+Python读书笔记：细节决定成败(2)
+
+2016-01-30    分类：WEB开发、编程开发、首页精华暂无人评论     来源：一个独行的程序员
+分享到：更多0
+感谢一个@一个独行的程序员的投递   来自一个独行的程序员
+背景：我本来是一个信奉Java大法好的程序员。但是最近由于工作原因，不得不开始学习python。因此，写下这个读书笔记，希望能起到一个抛砖引玉的作用。原文中所有引用部分均来自python官方的tutorial
+上接：Python读书笔记：细节决定成败（1）
+8.input() vs raw_input()
+
+他们的作用都是用来读取命令行或者文件中的数据，区别在于返回结果
+input()返回的是numeric，如int,flat,double
+raw_input()返回的是String
+举个例子：
+>>> input()
+12+2     #comand line input
+14         #ouput
+>>> raw_input()
+12+2     #comand line input
+'12+2'    #ouput
+然而在读过python的源码后，你会发现其实input()是通过raw_input来实现的：
+def input(prompt):
+    return (eval(raw_input(prompt)))
+9.Output Formating
+
+从C语言开始，格式化字符串就已经为程序员所熟知，不管是C/C++还是Java，我觉得都没有python在输出格式化方面做的这么简练易用。举两个例子：
+zfill()
+
+‘pads a numeric string on the left with zeros. It understands about plus and minus signs:‘
+这个函数的厉害之处在于它不仅能够高位补零，而且可以识别正负号！
+>>> '12'.zfill(5)
+'00012'
+>>> '-3.14'.zfill(7)
+'-003.14'
+str.format()
+
+当有多个string需要输出时，这个函数非常的powerful：
+>>> print 'We are the {} who say "{}!"'.format('knights', 'Ni')
+We are the knights who say "Ni!"
+with position:
+>>> print '{0} and {1}'.format('spam', 'eggs')
+spam and eggs
+>>> print '{1} and {0}'.format('spam', 'eggs')
+eggs and spam
+with keyword:
+>>> print 'This {food} is {adjective}.'.format(
+...       food='spam', adjective='absolutely horrible')
+This spam is absolutely horrible.
+combine position with keyword:
+>>> print 'The story of {0}, {1}, and {other}.'.format('Bill', 'Manfred',
+...                                                    other='Georg')
+The story of Bill, Manfred, and Georg.
+对于需要遍历输出对应项的情况，python更是给出了一个不错的解决方案—>:,再结合一下position和format，完美！
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 7678}
+>>> for name, phone in table.items():
+...     print '{0:10} ==> {1:10d}'.format(name, phone)
+...
+Jack       ==>       4098
+Dcab       ==>       7678
+Sjoerd     ==>       4127
+10.Serializing and Deserializing
+
+序列化(serializing)和反序列化(deserializing)是为了数据的易用性而出现的，在不同开发平台和互联网中，数据的表示方法一直都是处于百花齐放的局面。直到JSON的出现，才有了一个便于交换(interchange)的数据格式
+序列化: 将python中的数据结构以字符串形式表示
+反序列化: 将上述的字符串重建为python中的数据结构
+JSON: JavaScript Object Notation
+简单来说，只需要记住两个函数json.dumps()和json.load()就可以了。他们的函数原型分别是：
+json.dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, encoding="utf-8", default=None, sort_keys=False, **kw)
+两个函数的参数意义相同，可以自行阅读tutorial了解详情，这里不展开了。
+json.load(fp[, encoding[, cls[, object_hook[, parse_float[, parse_int[, parse_constant[, object_pairs_hook[, **kw]]]]]]]])
+11.Class Objects
+
+python是支持OOP的语言，因此接下来几节介绍python中到的各种对象。
+类是一个抽象的概念，类对象(class objects)支持两种操作(operations):
+属性引用(attribute references)
+实例化(instantiation)
+与其它大多数OOP语言一样，python的类也有变量和方法(method)，不过却又略有不同。python的变量(data attribute)是属于类的，也即是说只要定义了类，那么不需要实例化，就能够直接访问，类似于java中类的静态变量(static variable).并且可以直接通过赋值(assign)去修改值。举例：
+>>> class Simple:
+...     i = 1
+...     def foo(self):
+...             return "hello world"
+... 
+>>> Simple.i
+1
+>>> Simple.i = 2
+>>> Simple.i
+2
+但是类的方法却必须通过实例化后才能访问，python中的实例化也有其独特之处，实例对象(instance object)放在下节讲。如果没有实例化而直接去访问类中定义的方法，会报unbound method,这是因为方法(method)是必须作用到一个实际的对象上的，而类对象本身是抽象的：
+>>> Simple.foo
+<unbound method Simple.foo>
+至于为什么类中的方法必须要自带一个self参数，我后面再讲，这也是python作为一个动态语言，与静态的OOP之间最大的差异！
+12.Instance Objects
+
+实例对象(instance object)是一个具体的可操作的对象，其实例化的过程在python的官方解释中是这么说明的：
+“Class instantiation uses function notation. Just pretend that the class object is a parameterless function that returns a new instance of the class.“
+官方让我们假设类对象是返回一个实例对象的无参函数，所以实例化的过程就像是得到一个函数的返回结果。(晕吗?)个人感觉按照C++和Java的构造器(constructor)来理解，也不会出现太大问题。
+>>> x = Simple()
+>>> x.foo()
+'hello world'
+既然要实例化，必然躲不过一个词“初始化”(initialization)，python中定义了__init()__这个方法来初始化实例对象。举个例子：
+>>> class A:
+...     i = 1
+...     def __init__(self):
+...             self.i = 3
+... 
+>>> 
+>>> A.i
+1    ＃class attribute
+>>> x = A()
+>>> x.i
+3    #instance attribute
+>>> A.i
+1    #class attribute
+前面我做了比喻，类的变量和Java中的静态变量类似，但这里可以看出它们的不同。在Java中静态变量是属于类的，被其所有实例共用。然而python的变量不是共用的，所以我才说python的类理解起来更抽象一点，类也是一个对象，不过和实例对象却不同，更加抽象(晕吗?)
+之所以有这么大的差异，主要原因是python是一个动态语言，它可以动态添加属性，这就令很多一直用Java和C++的人不习惯。不过当你习惯之后，你会发觉它这种设计也真是好处多多。比如，你可以随时给你的类增加新的变量啊～
+>>> class A:
+...     i = 1
+... 
+>>> A.j = 2
+>>> A.j
+2
+13.Method Objects
+
+在python中，方法(method)和函数(function)是不同的。方法应该特指在类中定义的，其特征就是在定义时必须带上一个参数self。这和其他语言隐式的处理this这个参数不同（两者作用一样）。python必须要显示的指定这个方法作用的对象，这样的好处是在调用时能够确保方法是绑定(bound)在作用对象上的。因此，类是不能凭空调用方法的，必须作用在实例上才行，所以前面章节的例子里会出现unbound method这个错误提示。举个例子：
+>>> class B:
+...     def f(self):
+...             return "Hello Method"
+... 
+>>> b = B()    #b is an instance object
+>>> b.f()        
+'Hello Method'he
+>>> B.f(b)    #B is a class object 
+'Hello Method'
+当类B有了实例b之后，它也是可以调用方法f的，因为这一切都只是为了确保这个方法的作用对象是存在的！现在回过头来看self，其实就是指类的实例本身作为参数传进这个函数：
+“the special thing about methods is that the object is passed as the first argument of the function.“
+这样也就好解释为什么函数本身定义时是可以不用显示的写self参数了，因为函数本身可以不属于任何类。如果有学过pascal这类面向过程的语言，就很好理解这句话了。
+>>> def f():        #Void, like a procedure in pascal
+...     1 + 2
+... 
+>>> f()
+>>> def ff():        #Return, like a function in pascal
+...     return 1 + 2
+... 
+>>> ff()
+3
