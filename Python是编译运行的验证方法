@@ -1,0 +1,27 @@
+Python是编译运行的验证方法
+
+投稿：junjie 字体：[增加 减小] 类型：转载 时间：2015-01-30 我要评论
+这篇文章主要介绍了Python是编译运行的验证方法,本文讲解了一个小方法来验证Python是编译运行还是解释运行,需要的朋友可以参考下
+虽然Python被说成是一种解释型语言，但是实际上，Python源程序要先经过编译，然后才能运行。
+与Java语言类似，Python源程序编译之后得到的是字节码，交由Python虚拟机来运行。
+关于这一点，我们可以这样来验证：
+复制代码代码如下:
+
+#!/usr/bin/python
+ 
+print "position1"
+1_syntax_error_identifier
+print "position2"
+
+将它保存为program.py，然后在shell窗口中运行它：
+复制代码代码如下:
+
+root@dell:~$ ./program.py
+  File "./program.py", line 4
+    1_syntax_error_identifier
+                            ^
+SyntaxError: invalid syntax
+root@dell:~$ <br>
+
+从这里可以看出，如果Python是纯粹解释运行的话，那么它应该输出position1。
+如果是编译运行的话，首先应该发现源代码中的语法错误，这正是本例展示的情况。
