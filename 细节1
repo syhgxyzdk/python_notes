@@ -1,0 +1,198 @@
+Python读书笔记：细节决定成败（1）
+
+2016-01-14    分类：WEB开发、编程开发、首页精华1人评论     来源：一个独行的程序员
+分享到：更多0
+感谢一个@一个独行的程序员的投递   来自一个独行的程序员
+背景：我本来是一个信奉Java大法好的程序员。但是最近由于工作原因，不得不开始学习python。因此，写下这个读书笔记，希望能起到一个抛砖引玉的作用。原文中所有引用部分均来自python官方的tutorial，传送门：https://docs.python.org/2/tutorial/
+1.[a:b)
+
+在使用list时，我们会常常使用左右区间的位置来赋值(range)或删除(del)其中的值。一定记住这个区间是一个左闭右开的区间；
+>>>a = range(1,6)
+>>>a
+[1,2,3,4,5]
+>>>del a[1,3]
+>>> a
+[1,4,5]
+实际删除的是1，2号元素，所以剩下的是[1,4,5]
+2.Lambda表达式
+
+如果使用过filter/map/reduce这几个函数，就会知道lambda表达式真的在匿名函数的写法上非常省时省力，且便于阅读。举个例子：
+>>> filter(lambda x : x % 2 == 0, range(10))
+[0, 2, 4, 6, 8]
+>>> map(lambda x, y : x * y, range(1,4), range(1,4))
+[1, 4, 9]
+>>> reduce(lambda x, y : x + y, range(101))
+5050
+lambda表达式的用法也很简单，“：”前写明参数，后面写表达式（函数体），表达式的结果就是函数返回值，这一点和R语言很像。
+3.Tuples
+
+A tuple consists of a number of values separated by commas
+元组（tuples）在数据处理方面非常的powerful，因为它可以包含任意类型的变量，且可以嵌套，各个元素间用逗号分隔。但是，请注意：Tuples are immutable!(这一点和String一样)，但是他们可以包含mutable的变量。
+>>> t = 12345, 54321, 'hello!'
+>>> t[0]
+12345
+>>> t
+(12345, 54321, 'hello!')
+>>> # Tuples may be nested:
+... u = t, (1, 2, 3, 4, 5)
+>>> u
+((12345, 54321, 'hello!'), (1, 2, 3, 4, 5))
+>>> # Tuples are immutable:
+... t[0] = 88888
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'tuple' object does not support item assignment
+>>> # but they can contain mutable objects:
+... v = ([1, 2, 3], [3, 2, 1])
+>>> v
+([1, 2, 3], [3, 2, 1])
+u可以看作一个嵌套的tuple；v可以看做包含了2个list的tuple，而list是可以赋值的mutable变量；但是我们不能直接去修改tuple中元素的值，因为tuple本身是immutable的，搞清楚这一点很重要。
+4.unpacking
+
+unpacking应该和tuples结合起来看：如果将一个个变量装进tuple中被称作pack的话；那么将tuple拆分成一个个独立的变量就叫做unpack。
+>>> t = 1, 2, ‘hello’
+>>> t
+(1, 2, ‘hello’)
+>>> x, y, z = t
+>>> x
+1
+>>> y
+2
+>>> z
+‘hello’
+值得注意的是：左边的变量数量一定要与tuple中的元素数量一致！
+Sequence unpacking requires the list of variables on the left to have the same number of elements as the length of the sequence.
+5.Loop techniques
+
+python对于循环的支持非常好，内置了很多有用的函数，这里以enumerate(), zip(), reversed(), sorted(),iteritems()为例进行说明。
+enumerate()
+the position index and corresponding value can be retrieved at the same time using the enumerate() function.
+可以在循环时同时取得下标位置和对应值
+>>> for i, v in enumerate([‘tic’, ‘tac’, ‘toe’]):
+…           print i, v
+…
+0 tic
+1 tac
+2 toe
+zip()
+To loop over two or more sequences at the same time, the entries can be paired with the zip() function.
+在循环中如果有两个几以上的队列时，可以通过zip函数进行对应的匹配
+>>> questions = [‘name’, ‘quest’, ‘favorite color’]
+>>> answers = [‘lancelot’, ‘the holy grail’, ‘blue’]
+>>> for q, a in zip(questions, answers):
+…           print ‘What is your {0}? It is {1}.’.format(q, a)
+…
+What is your name? It is lancelot.
+What is your quest? It is the holy grail.
+What is your favorite color? It is blue.
+reversed()
+To loop over a sequence in reverse, first specify the sequence in a forward direction and then call the reversed()function.
+倒序输出结果
+>>> for i in reversed(xrange(1,10,2)):
+…           print i
+…
+9
+7
+5
+3
+1
+sorted()
+To loop over a sequence in sorted order, use the sorted() function which returns a new sorted list while leaving the source unaltered.
+遍历后返回一个有序队列，并且不修改原队列。
+>>> basket = [‘apple’, ‘orange’, ‘apple’, ‘pear’, ‘orange’, ‘banana’]
+>>> for f in sorted(set(basket)):
+…           print f
+…
+apple
+banana
+orange
+pear
+iteritems()
+When looping through dictionaries, the key and corresponding value can be retrieved at the same time using the iteritems() method.
+当遍历dictionaries时，可以通过iteritems()来分别获取key和value
+>>> knights = {‘gallahad’: ‘the Pure’, ‘robin’: ‘the brave’}
+>>> for k, v in knights.iteritems():
+…           print k, v
+…
+gallahad the pure
+robin the brave
+6.Modules
+
+很多人在开发时往往会涉及第三方package和多个脚本的情况，但是其实很多时候有些细节上的东西没有弄明白往往会出现事倍功半的效果。剩下两节就好好讲清楚Modules和Packages的关系，不感兴趣的可以跳过。
+A module is a file containing Python definitions and statements. The file name is the module name with the suffix .py appended. Within a module, the module’s name (as a string) is available as the value of the global variable __name__.
+module就是一个包含了一些定义（函数，类，变量，对象等）和语句的文件，一般以”.py”作为后缀，编译后的python文件以”.pyc”作后缀。在module内，有一个全局变量”__name__”,可以通过dir()函数来查看当前环境中有哪些已定以的变量和函数。
+以经典的fibonacci数列为例，假设下面这段代码是写在”fibo.py”这个文件中：
+# Fibonacci numbers module
+def fib(n): # write Fibonacci series up to n
+a, b = 0, 1
+while b < n:
+print b,
+a, b = b, a+b
+def fib2(n): # return Fibonacci series up to n
+result = []
+a, b = 0, 1
+while b < n:
+result.append(b)
+a, b = b, a+b
+return result
+现在如果我们想要在命令行或者终端中使用这个函数，我们可以import这个module：
+>>> import fibo
+>>> fibo.fib(1000)
+1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987
+>>> fibo.fib2(100)
+[1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
+你还可以给这个一个简单的别名，使代码更简洁：
+>>> fib = fibo.fib
+>>> fib(500)
+1 1 2 3 5 8 13 21 34 55 89 144 233 377
+7.Packages
+
+(1)Packages are a way of structuring Python’s module namespace by using “dotted module names”.
+(2)A package is A collection of modules
+简单来说，package就是一个有结构的module的集合，以便于实现某些特定功能和用途，比较出名的packages有：NumPy, PIL(Python Imaging Library)等等。
+它与modules最大的不同在于import时的细节，一定要注意语法！
+假设我们有个叫做”sound”的package，它主要用来处理多种不同格式的音频文件，如:mp3,wmv,wma等。它的结构如下：
+sound/                          Top-level package
+      __init__.py               Initialize the sound package
+      formats/                  Subpackage for file format conversions
+              __init__.py
+              wavread.py
+              wavwrite.py
+              aiffread.py
+              aiffwrite.py
+              auread.py
+              auwrite.py
+              ...
+      effects/                  Subpackage for sound effects
+              __init__.py
+              echo.py
+              surround.py
+              reverse.py
+              ...
+      filters/                  Subpackage for filters
+              __init__.py
+              equalizer.py
+              vocoder.py
+              karaoke.py
+              ...
+python官方不建议import整个package，因为它会降低代码的可读性。
+Note that in general the practice of importing * from a module or package is frowned upon, since it often causes poorly readable code.
+因此，我们有必要学会如何科学正确的import我们需要的submodule或subpackage.假设我们只需要echo.py这个module，我们可以单独import它：
+>>>import sound.effects.echo
+>>>#This loads the submodule sound.effects.echo. It must be referenced with its full name. 必须使用全名去调用echo中的函数
+>>>sound.effects.echo.echofilter(input, output, delay=0.7, atten=4)
+>>>#An alternative way of importing the submodule is: 另一种import方法：
+>>>from sound.effects import echo
+>>>#This also loads the submodule echo, and makes it available without its package prefix, so it can be used as follows:通过from关键字，我们可以在调用时省去包名的前缀
+>>>echo.echofilter(input, output, delay=0.7, atten=4)
+>>>#Yet another variation is to import the desired function or variable directly:如果你知道要调用什么函数，甚至可以直接import这个函数
+>>>from sound.effects.echo import echofilter
+>>>#Again, this loads the submodule echo, but this makes its function echofilter() directly available:这样的话，你就可以像调用本地函数一样，省去所有前缀
+>>>echofilter(input, output, delay=0.7, atten=4)
+通过三种import方法的对比，相信大家能够根据自己的实际情况找到最适合自己的方法。
+但是，这里有一点语法上的细节，需要注意！
+Note that when using from package import item, the item can be either a submodule (or subpackage) of the package, or some other name defined in the package, like a function, class or variable. The import statement first tests whether the item is defined in the package; if not, it assumes it is a module and attempts to load it. If it fails to find it, an ImportError exception is raised.
+当使用from package import item这种语法结构时，item可以是一个submodule或subpackage，甚至是package中定义的一个函数，类和变量等对象；import会先假设item是一个对象，去测试其是否被定义；如果没有找到，它会尝试去加载，如果仍然没有找到，那么这时候会报ImportError
+Contrarily, when using syntax like import item.subitem.subsubitem, each item except for the last must be a package; the last item can be a module or a package but can’t be a class or function or variable defined in the previous item.
+相反，如果使用item.subitem.subsubitem这样的语法结构时，除了最后一个item可以是module或者package以外，上级（前缀）的所有item必须且只能是package，请谨记！
+
