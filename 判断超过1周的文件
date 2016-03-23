@@ -1,0 +1,25 @@
+# coding: utf-8
+import time
+
+
+def move_weekly_log():
+    res_dir = './results/'
+    his_dir = './results/history/'
+    if not os.path.exists(his_dir):
+        os.makedirs(his_dir)
+    file_list = os.listdir(res_dir)
+    for file_name in file_list:
+        log_file = os.path.join(res_dir,file_name)
+        if is_one_week_ago(log_file):
+            bak_file = os.path.join(his_dir,file_name)
+            shutil.move(log_file,bak_file)
+
+def is_one_week_ago(log_file):
+    cur_time = time.time()
+    log_time = os.path.getmtime(log_file)
+    print'-'*50
+    print cur_time, log_time
+    print'-'*50
+    if (cur_time-log_time) > 7*24*3600:
+        return True
+    return False
