@@ -1,0 +1,68 @@
+
+
+# coding: utf-8
+
+"""
+读取内存监控日志, 画出内存曲线图.
+"""
+
+MEM = 2048 # 服务器内存, 或可能的进程占用的最大内存: MB)
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def get_sample_list(log_file, value_column_index):
+    # value_column_index, 内存监控的值是第几列? 下标从零开始
+    sample_list = [] # 有效的采样点列表
+    log = file(log_file)
+
+    for ln in log:
+        if ln.strip():
+            ln_parts = ln.strip().split(" ")
+            if len(ln_parts) > value_column_index:
+                try:
+                    mem = ln_parts[value_column_index].strip()
+                    if mem.endswith('m'):
+                        mem = mem.replace('m', '')
+                        sample_list.append(float(mem))
+                    if mem.endswith('g'):
+                        mem = mem.replace('g', '')
+                        sample_list.append(float(mem)*1024)
+                except:
+                    print "invalid line : %s" % ln.strip()
+    log.close()
+    return sample_list
+
+def main():
+    sample_list_tom = get_sample_list('tomcat.stat', 5)
+    sample_list_rds = get_sample_list('redis.stat', 5)
+
+    mem_curve = np.arange(0, len(sample_list_tom), 1)
+    plt.plot(mem_curve, sample_list_tom, label='tomcat', color='black', linewidth=1)
+
+    mem_curve = np.arange(0, len(sample_list_rds), 1)
+    plt.plot(mem_curve, sample_list_rds, 'b--', label='redis', linewidth=1.5) # 'b--' 表示用blue虚线
+
+    # 设置x,y轴的坐标范围
+    i = len(sample_list_tom)
+    j = len(sample_list_rds)
+    num = i if i > j else j 
+    plt.xlim(0, num) # 注意这里, 用最大采样个数表示x轴的坐标最大值
+    plt.ylim(0, MEM) # y轴用内存最大值
+    # 设置x,y轴的单位(名称)
+    plt.xlabel("Time")
+    plt.ylabel("MB")
+
+    # 开启网格, 设置标题
+    plt.grid()
+    plt.title("Memory(MB)")
+
+    # 显示曲线的图样
+    plt.legend()
+
+    # 绘图显示
+    plt.show()
+
+
+if __name__ == '__main__':
+    main()
